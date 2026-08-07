@@ -54,7 +54,7 @@ from memory import (
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv("SECRET_KEY", "change-this-secret")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 UPLOAD_FOLDER = "static/uploads"
 
