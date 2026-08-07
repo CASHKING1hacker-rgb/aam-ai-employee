@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>A.A.M CASH KING1 AI Employee</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h2>📶 A.A.M CASH KING1</h2>
+
+        <p>Unlimited Airtel Data AI Employee</p>
+
+    </div>
+
+    <!-- CHAT AREA -->
+
+    <div class="chat-box" id="chat-box">
+
+        {% for chat in chats %}
+
+            <div class="user-message">
+                👤 {{ chat[0] }}
+            </div>
+
+            <div class="ai-message">
+                🤖 {{ chat[1] }}
+            </div>
+
+        {% endfor %}
+
+        <!-- NOTIFICATIONS -->
+
+        {% if notifications %}
+
+        <div class="order-card" id="notifications">
+
+            <h3>🔔 Notifications</h3>
+
+            {% for note in notifications %}
+
+                <p>{{ note["message"] }}</p>
+
+                <small>{{ note["created_at"] }}</small>
+
+                <hr>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+        <!-- MY ORDERS -->
+
+        {% if orders %}
+
+        <div class="order-card" id="orders">
+
+            <h3>📦 My Orders</h3>
+
+            <table style="width:100%;">
+
+                <tr>
+                    <th>Invoice</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for order in orders %}
+
+                <tr>
+
+                    <td>{{ order["invoice"] }}</td>
+
+                    <td>{{ order["service"] }}</td>
+
+                    <td>
+
+                        {% if order["status"]=="Completed" %}
+
+                            <span class="badge badge-approved">
+                                Approved
+                            </span>
+
+                        {% elif order["status"]=="Pending" %}
+
+                            <span class="badge badge-pending">
+                                Pending
+                            </span>
+
+                        {% elif order["status"]=="Rejected" %}
+
+                            <span class="badge badge-rejected">
+                                Rejected
+                            </span>
+
+                        {% else %}
+
+                            {{ order["status"] }}
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- INPUT -->
+
+    <form class="input-area" id="chat-form">
+
+        <input
+            type="text"
+            name="message"
+            id="message"
+            placeholder="Ask anything..."
+            autocomplete="off"
+            required>
+
+        <button type="submit">
+            🚀 SEND
+        </button>
+
+    </form>
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        Welcome <strong>{{ session["customer_name"] }}</strong>
+
+        |
+
+        <a href="/logout">Logout</a>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script>
+
+const chatBox = document.getElementById("chat-box");
+
+chatBox.scrollTop = chatBox.scrollHeight;
+
+</script>
+
+</body>
+
+</html>

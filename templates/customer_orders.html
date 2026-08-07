@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Customer Orders</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<div class="sidebar">
+
+<h2>📶 A.A.M</h2>
+
+<a href="/admin">🏠 Dashboard</a>
+<a href="/admin/customers">👥 Customers</a>
+<a href="/admin/payments">💳 Payments</a>
+
+</div>
+
+<div class="main-content">
+
+<h2>📦 Customer Orders</h2>
+
+<table>
+
+<tr>
+<th>Invoice</th>
+<th>Service</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+
+{% for order in orders %}
+
+<tr>
+
+<td>{{ order["invoice"] }}</td>
+
+<td>{{ order["service"] }}</td>
+
+<td>{{ order["amount"] }} UGX</td>
+
+<td>
+
+{% if order["status"]=="Completed" %}
+
+<span class="badge badge-approved">
+Approved
+</span>
+
+{% elif order["status"]=="Pending" %}
+
+<span class="badge badge-pending">
+Pending
+</span>
+
+{% else %}
+
+<span class="badge badge-rejected">
+Rejected
+</span>
+
+{% endif %}
+
+</td>
+
+<td>{{ order["created_at"] }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<div class="sidebar">
+
+<h2>📶 A.A.M</h2>
+
+<a href="/admin">🏠 Dashboard</a>
+
+<a href="/admin/payments">💳 Payments</a>
+
+<a href="/admin/logout">🚪 Logout</a>
+
+<h3 style="margin-top:30px;">🕒 Recent Activity</h3>
+
+<div class="order-card">
+
+{% if activity %}
+
+    {% for item in activity %}
+
+        <p>
+
+        <strong>{{ item["created_at"] }}</strong>
+
+        <br>
+
+        {{ item["action"] }}
+
+        </p>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No recent activity.</p>
+
+{% endif %}
+
+</div>
+
+</div>
+
+<div class="main-content">
+
+<div class="header">
+
+<h2>Admin Dashboard</h2>
+
+<p>Welcome Administrator</p>
+
+</div>
+
+<div class="dashboard">
+
+<div class="stats-grid">
+
+<div class="stat-card">
+<div class="stat-icon">👥</div>
+<div class="stat-number">{{ customers }}</div>
+<div class="stat-title">Customers</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">📦</div>
+<div class="stat-number">{{ orders }}</div>
+<div class="stat-title">Orders</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">💬</div>
+<div class="stat-number">{{ chats }}</div>
+<div class="stat-title">Chats</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">💰</div>
+<div class="stat-number">{{ revenue }}</div>
+<div class="stat-title">Revenue</div>
+</div>
+
+<div style="margin:20px 0;text-align:center;">
+
+<a href="/admin/payments">
+<button class="primary-btn">💳 Payments</button>
+</a>
+
+<a href="/admin/customers">
+    <button class="primary-btn">
+        👥 Customers
+    </button>
+</a>
+
+<a href="/admin">
+<button class="primary-btn">📦 Orders</button>
+</a>
+
+<a href="/">
+<button class="primary-btn">💬 Customer Chat</button>
+</a>
+
+</div>
+
+<h3 style="margin-top:30px;">📦 Recent Orders</h3>
+
+<table>
+
+<tr>
+
+<th>Customer</th>
+<th>Service</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Actions</th>
+
+</tr>
+
+{% for order in order_list %}
+
+<tr>
+
+<td>{{ order["name"] }}</td>
+
+<td>{{ order["service"] }}</td>
+
+<td>{{ order["amount"] }} UGX</td>
+
+<td>
+
+{% if order["status"]=="Completed" %}
+
+<span class="badge badge-approved">
+Approved
+</span>
+
+{% elif order["status"]=="Pending" %}
+
+<span class="badge badge-pending">
+Pending
+</span>
+
+{% else %}
+
+<span class="badge badge-rejected">
+Rejected
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<a href="/complete/{{ order['id'] }}">
+<button class="primary-btn">
+✅ Complete
+</button>
+</a>
+
+<a href="/delete/{{ order['id'] }}"
+onclick="return confirm('Delete this order?');">
+<button class="primary-btn">
+🗑 Delete
+</button>
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+setInterval(function(){
+
+location.reload();
+
+},30000);
+
+</script>
+
+</body>
+</html>

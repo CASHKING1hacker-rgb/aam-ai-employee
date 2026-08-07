@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Approvals</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="chat-container">
+
+    <div class="header">
+        <h2>💳 Payment Approvals</h2>
+    </div>
+
+    <!-- Uploaded payment proofs -->
+
+<h2>📷 Uploaded Receipts</h2>
+
+{% for payment in payments %}
+
+<div class="order-card">
+
+    <h3>{{ payment["name"] }}</h3>
+
+    <p><b>Invoice:</b> {{ payment["invoice"] }}</p>
+
+    <p><b>Service:</b> {{ payment["service"] }}</p>
+
+    <p><b>Amount:</b> {{ payment["amount"] }} UGX</p>
+
+    <p><b>Status:</b> {{ payment["status"] }}</p>
+
+    <p>
+        <a href="/uploads/{{ payment['filename'] }}" target="_blank">
+            📷 View Receipt
+        </a>
+    </p>
+
+    <a href="/approve/{{ payment['order_id'] }}">
+        <button class="approve-btn">
+            ✅ Approve
+        </button>
+    </a>
+
+    <a href="/reject/{{ payment['order_id'] }}">
+        <button class="reject-btn">
+            ❌ Reject
+        </button>
+    </a>
+
+</div>
+
+{% endfor %}
+
+
+<!-- Invoice payments -->
+
+<h2>🧾 Invoice Verification</h2>
+
+{% for order in orders %}
+
+{% if order["payment_invoice"] %}
+
+<div class="order-card">
+
+    <h3>{{ order["service"] }}</h3>
+
+    <p>
+        <b>Invoice:</b>
+        {{ order["invoice"] }}
+    </p>
+
+    <p>
+        <b>Customer Payment Ref:</b>
+        {{ order["payment_invoice"] }}
+    </p>
+
+    <p>
+        <b>Amount:</b>
+        {{ order["amount"] }} UGX
+    </p>
+
+    <p>
+        <b>Status:</b>
+        {{ order["status"] }}
+    </p>
+
+
+    <a href="/approve/{{ order['id'] }}">
+        <button class="approve-btn">
+            ✅ Approve
+        </button>
+    </a>
+
+
+    <a href="/reject/{{ order['id'] }}">
+        <button class="reject-btn">
+            ❌ Reject
+        </button>
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>

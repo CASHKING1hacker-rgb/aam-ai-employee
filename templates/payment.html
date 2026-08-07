@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Payment Upload</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="chat-container">
+
+
+<div class="header">
+
+<h2>📶 A.A.M CASH KING1</h2>
+
+<p>Payment Confirmation</p>
+
+</div>
+
+
+
+<div class="order-card">
+
+
+<h3>📦 Your Order</h3>
+
+
+<p>
+Service:
+{{ order["service"] }}
+</p>
+
+
+<p>
+Amount:
+{{ order["amount"] }} UGX
+</p>
+
+
+<p>
+Invoice:
+{{ order["invoice"] }}
+</p>
+
+
+
+<form method="POST"
+enctype="multipart/form-data">
+
+
+<input
+type="file"
+name="proof"
+required>
+
+
+<button type="submit">
+
+💳 Upload Proof
+
+</button>
+
+
+</form>
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>

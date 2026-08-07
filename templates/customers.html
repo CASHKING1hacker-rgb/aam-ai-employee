@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Customers</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<div class="sidebar">
+
+<h2>📶 A.A.M</h2>
+
+<a href="/admin">🏠 Dashboard</a>
+<a href="/admin/customers">👥 Customers</a>
+<a href="/admin/payments">💳 Payments</a>
+<a href="/admin/logout">🚪 Logout</a>
+
+</div>
+
+<div class="main-content">
+
+<h2>👥 Customers</h2>
+
+<table>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Phone</th>
+<th>Actions</th>
+
+</tr>
+
+{% for customer in customers %}
+
+<tr>
+
+<td>{{ customer["id"] }}</td>
+
+<td>{{ customer["name"] }}</td>
+
+<td>{{ customer["phone"] }}</td>
+
+<td>
+
+<a href="/admin/customer/{{ customer['id'] }}">
+<button class="primary-btn">
+💬 View Chat
+</button>
+</a>
+
+<a href="/admin/customer/orders/{{ customer['id'] }}">
+<button class="approve-btn">
+📦 Orders
+</button>
+</a>
+
+<a href="/admin/customer/delete/{{ customer['id'] }}"
+onclick="return confirm('Delete this customer?')">
+<button class="reject-btn">
+🗑 Delete
+</button>
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
