@@ -1008,31 +1008,7 @@ def get_notifications(customer_id):
     conn.close()
 
     return rows
-    
-def get_customer_orders(customer_id):
-
-    conn = connect()
-    c = conn.cursor()
-
-    c.execute(
-        """
-        SELECT
-            invoice,
-            service,
-            amount,
-            status
-        FROM orders
-        WHERE customer_id=?
-        ORDER BY id DESC
-        """,
-        (customer_id,)
-    )
-
-    rows = c.fetchall()
-
-    conn.close()
-
-    return rows                                                     
+                                                         
 def get_customers():
 
     conn = connect()

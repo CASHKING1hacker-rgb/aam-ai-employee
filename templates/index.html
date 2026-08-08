@@ -91,31 +91,39 @@ href="{{ url_for('static', filename='style.css') }}">
 
                     <td>
 
-                        {% if order["status"]=="Completed" %}
+    {% if order["status"]=="Completed" %}
 
-                            <span class="badge badge-approved">
-                                Approved
-                            </span>
+        <span class="badge badge-approved">
+            Approved
+        </span>
 
-                        {% elif order["status"]=="Pending" %}
+    {% elif order["status"]=="Pending" %}
 
-                            <span class="badge badge-pending">
-                                Pending
-                            </span>
+        <span class="badge badge-pending">
+            Pending
+        </span>
 
-                        {% elif order["status"]=="Rejected" %}
+        <br><br>
 
-                            <span class="badge badge-rejected">
-                                Rejected
-                            </span>
+        <a href="/payment/{{ order['id'] }}"
+           class="upload-button">
+            📸 Upload Payment Screenshot
+        </a>
 
-                        {% else %}
+    {% elif order["status"]=="Rejected" %}
 
-                            {{ order["status"] }}
+        <span class="badge badge-rejected">
+            Rejected
+        </span>
 
-                        {% endif %}
+    {% else %}
 
-                    </td>
+        {{ order["status"] }}
+
+    {% endif %}
+
+</td>
+            
 
                 </tr>
 
