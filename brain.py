@@ -192,7 +192,7 @@ Assistant:
             )
 
         if order_id:
-            answer += f"""
+    answer += f"""
 
 📦 ORDER DETAILS
 
@@ -202,7 +202,11 @@ Assistant:
 
 🧾 Invoice: {invoice}
 
-PAYMENT_LINK:{order_id}
+💳 Please make payment using the payment method provided above.
+
+📸 After payment, upload your payment screenshot here:
+
+/payment/{order_id}
 """
 
         return answer
