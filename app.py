@@ -444,15 +444,13 @@ def admin_payments():
         return redirect("/admin/login")
 
     payments = get_all_payments()
-orders = get_orders()
-
-    print(payments)   # <-- add this line
+    orders = get_orders()
 
     return render_template(
-    "payments.html",
-    payments=payments,
-    orders=orders
-)
+        "payments.html",
+        payments=payments,
+        orders=orders
+    )
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
