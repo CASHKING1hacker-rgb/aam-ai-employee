@@ -192,7 +192,7 @@ Assistant:
             )
 
         if order_id:
-    answer += f"""
+            answer += f"""
 
 📦 ORDER DETAILS
 
