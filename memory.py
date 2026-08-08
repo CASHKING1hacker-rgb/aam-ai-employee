@@ -503,6 +503,45 @@ def delete_order(order_id):
     conn.close()
 
 
+def delete_customer(customer_id):
+
+    conn = connect()
+    c = conn.cursor()
+
+    # Delete the customer's orders first
+    c.execute(
+        """
+        DELETE FROM orders
+        WHERE customer_id=?
+        """,
+        (customer_id,)
+    )
+
+    # Delete the customer's chats
+    try:
+        c.execute(
+            """
+            DELETE FROM chats
+            WHERE customer_id=?
+            """,
+            (customer_id,)
+        )
+    except Exception:
+        pass
+
+    # Delete the customer
+    c.execute(
+        """
+        DELETE FROM customers
+        WHERE id=?
+        """,
+        (customer_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
 def search_orders(keyword):
 
     conn = connect()

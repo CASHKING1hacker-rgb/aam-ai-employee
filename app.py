@@ -509,8 +509,9 @@ def admin_customers():
     return render_template(
         "customers.html",
         customers=get_customers()
-    )                  
-     
+    )
+
+
 @app.route("/admin/customer/<int:customer_id>")
 def customer_chat(customer_id):
 
@@ -523,9 +524,35 @@ def customer_chat(customer_id):
         "customer_chat.html",
         chats=chats,
         customer_id=customer_id
-    )                                        
+    )
 
-                                                                                                                                                                                                                                                                                                                                                                                                          
+
+@app.route("/admin/customer/orders/<int:customer_id>")
+def customer_orders(customer_id):
+
+    if not session.get("admin"):
+        return redirect("/admin/login")
+
+    orders = get_customer_orders(customer_id)
+
+    return render_template(
+        "customer_orders.html",
+        orders=orders,
+        customer_id=customer_id
+    )
+
+
+@app.route("/admin/customer/delete/<int:customer_id>")
+def customer_delete(customer_id):
+
+    if not session.get("admin"):
+        return redirect("/admin/login")
+
+    delete_customer(customer_id)
+
+    return redirect("/admin/customers")
+
+
 # ===============================
 # START SERVER
 # ===============================

@@ -53,13 +53,13 @@ href="{{ url_for('static', filename='style.css') }}">
 
 <td>
 
-{% if order["status"]=="Completed" %}
+{% if order["status"]|lower=="completed" %}
 
 <span class="badge badge-approved">
 Approved
 </span>
 
-{% elif order["status"]=="Pending" %}
+{% elif order["status"]|lower in ["pending", "waiting verification"] %}
 
 <span class="badge badge-pending">
 Pending
