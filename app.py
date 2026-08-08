@@ -496,7 +496,7 @@ def admin_payments():
 def uploaded_file(filename):
 
     return send_from_directory(
-        "uploads",
+        app.config["UPLOAD_FOLDER"],
         filename
     )
        
