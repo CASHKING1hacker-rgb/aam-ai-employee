@@ -97,7 +97,7 @@ href="{{ url_for('static', filename='style.css') }}">
             Approved
         </span>
 
-    {% elif order["status"]=="pending" %}
+    {% elif order["status"]|lower in ["pending", "waiting verification"] %}
 
         <span class="badge badge-pending">
             Pending
