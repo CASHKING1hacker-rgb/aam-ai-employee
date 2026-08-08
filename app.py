@@ -354,31 +354,71 @@ def remove_order(order_id):
 @app.route("/payment/<int:order_id>", methods=["GET", "POST"])
 def payment(order_id):
 
+    order = get_order(order_id)
+
+    if not order:
+        return "Order not found.", 404
+
     if request.method == "POST":
 
         file = request.files.get("proof")
 
-        if file:
-
-            filename = file.filename
-
-            file.save(
-                "uploads/" + filename
-            )
-
-            save_payment_proof(
-                order_id,
-                filename
-            )
-
-            log_action(f"Payment proof uploaded for Order #{order_id}")
-
+        if not file or file.filename == "":
             return """
-            <h2>✅ Payment proof uploaded</h2>
-            <p>Waiting for approval.</p>
+            <h2>❌ No file selected</h2>
+            <p>Please select your payment screenshot and try again.</p>
+            <a href="javascript:history.back()">← Go Back</a>
             """
 
-    order = get_order(order_id)
+        filename = file.filename
+
+        filepath = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            filename
+        )
+
+        file.save(filepath)
+
+        save_payment_proof(
+            order_id,
+            filename
+        )
+
+        log_action(
+            f"Payment proof uploaded for Order #{order_id}"
+        )
+
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Submitted</title>
+        </head>
+
+        <body>
+
+        <div style="max-width:500px;margin:50px auto;text-align:center;font-family:Arial;">
+
+            <h1>✅ Payment Proof Uploaded</h1>
+
+            <p>Your payment screenshot has been received successfully.</p>
+
+            <p>⏳ <strong>Status: Waiting for verification</strong></p>
+
+            <p>Our team will verify your payment and update your order.</p>
+
+            <br>
+
+            <a href="/">
+                🏠 Return to My Orders
+            </a>
+
+        </div>
+
+        </body>
+        </html>
+        """
 
     return render_template(
         "payment.html",
