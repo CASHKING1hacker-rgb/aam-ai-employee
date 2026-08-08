@@ -22,6 +22,15 @@ def reply(message, customer_id):
 
     msg = message.lower()
 
+    if msg == "1":
+        msg = "activation"
+
+    elif msg == "2":
+        msg = "monthly premium"
+
+    elif msg == "3":
+        msg = "weekly premium"
+
     invoice_pattern = r"^(AAM-\d{6}|[A-Za-z0-9]{6,20})$"
 
     if re.match(invoice_pattern, message.strip()):
@@ -43,7 +52,7 @@ def reply(message, customer_id):
     service = None
     amount = None
 
-        # ==========================
+    # ==========================
     # ORDER DETECTION
     # ==========================
 
@@ -75,24 +84,28 @@ def reply(message, customer_id):
 
         log_action(f"New order created: {invoice}")
 
-
     elif any(word in msg for word in [
-        "premium file",
-        "premium files",
-        "monthly premium"
+        "monthly premium",
+        "monthly files",
+        "weekly premium",
+        "weekly files"
     ]):
 
-        service = "Monthly Premium Files"
+        if "weekly" in msg:
+            service = "Weekly Premium Files"
+        else:
+            service = "Monthly Premium Files"
 
         if pending_order_exists(customer_id, service):
+
+            amount = SERVICES.get(service, 0)
 
             return (
                 "✅ You already have a pending order.\n\n"
                 f"📦 Service: {service}\n"
-                "💰 Amount: 4,000 UGX\n\n"
+                f"💰 Amount: {amount:,} UGX\n\n"
                 "Please complete your payment for the existing order. "
-                "If you have already paid, send your Invoice/Transaction ID "
-                "and I will help you continue."
+                "If you have already paid, send your payment reference."
             )
 
         order_id, invoice = create_order(
@@ -102,7 +115,9 @@ def reply(message, customer_id):
 
         amount = SERVICES.get(service, 0)
 
-        log_action(f"New order created: {invoice}")
+        log_action(
+            f"New order created: {invoice}"
+        )
 
     # ==========================
     # LOAD KNOWLEDGE
