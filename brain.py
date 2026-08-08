@@ -20,7 +20,11 @@ URL = (
 
 def reply(message, customer_id):
 
-    msg = message.lower()
+    msg = message.lower().strip()
+
+    # ==========================
+    # MENU SELECTION
+    # ==========================
 
     if msg == "1":
         msg = "activation"
@@ -30,6 +34,10 @@ def reply(message, customer_id):
 
     elif msg == "3":
         msg = "weekly premium"
+
+    # ==========================
+    # INVOICE / PAYMENT REFERENCE
+    # ==========================
 
     invoice_pattern = r"^(AAM-\d{6}|[A-Za-z0-9]{6,20})$"
 
@@ -66,13 +74,15 @@ def reply(message, customer_id):
 
         if pending_order_exists(customer_id, service):
 
+            amount = SERVICES.get(service, 0)
+
             return (
                 "✅ You already have a pending order.\n\n"
                 f"📦 Service: {service}\n"
-                "💰 Amount: 53,000 UGX\n\n"
-                "Please complete your payment for the existing order. "
-                "If you have already paid, send your Invoice/Transaction ID "
-                "and I will help you continue."
+                f"💰 Amount: {amount:,} UGX\n\n"
+                "Please complete your payment for the existing order.\n\n"
+                "If you have already paid, upload your payment screenshot "
+                "using the Upload Payment Screenshot button in My Orders."
             )
 
         order_id, invoice = create_order(
@@ -82,7 +92,9 @@ def reply(message, customer_id):
 
         amount = SERVICES.get(service, 0)
 
-        log_action(f"New order created: {invoice}")
+        log_action(
+            f"New order created: {invoice}"
+        )
 
     elif any(word in msg for word in [
         "monthly premium",
@@ -104,8 +116,9 @@ def reply(message, customer_id):
                 "✅ You already have a pending order.\n\n"
                 f"📦 Service: {service}\n"
                 f"💰 Amount: {amount:,} UGX\n\n"
-                "Please complete your payment for the existing order. "
-                "If you have already paid, send your payment reference."
+                "Please complete your payment for the existing order.\n\n"
+                "If you have already paid, upload your payment screenshot "
+                "using the Upload Payment Screenshot button in My Orders."
             )
 
         order_id, invoice = create_order(
@@ -131,83 +144,118 @@ def reply(message, customer_id):
 
         knowledge = f.read()
 
-        # ==========================
+    # ==========================
     # CHAT MEMORY
     # ==========================
 
-    history = get_recent_chats(
+    chats = get_recent_chats(
         customer_id,
         limit=10
     )
 
-    history_text = ""
+    messages = []
 
-    for user_msg, ai_msg in history:
-        history_text += f"User: {user_msg}\n"
-        history_text += f"Assistant: {ai_msg}\n\n"
+    system_prompt = f"""
+You are the AI employee for A.A.M CASH KING1.
 
-    prompt = f"""
+Use the following business knowledge:
+
 {knowledge}
 
-Previous conversation:
-{history_text}
+Be helpful, concise and professional.
 
-User: {message}
-
-Assistant:
+If an order has already been created by the system, do not create
+another order yourself.
 """
-    
-    # ==========================
-    # AI REQUEST
-    # ==========================
 
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "contents": [
+    messages.append({
+        "role": "user",
+        "parts": [
             {
-                "parts": [
-                    {
-                        "text": prompt
-                    }
-                ]
+                "text": system_prompt
             }
         ]
+    })
+
+    for chat in chats:
+
+        messages.append({
+            "role": "user",
+            "parts": [
+                {
+                    "text": chat["user_message"]
+                }
+            ]
+        })
+
+        messages.append({
+            "role": "model",
+            "parts": [
+                {
+                    "text": chat["ai_reply"]
+                }
+            ]
+        })
+
+    messages.append({
+        "role": "user",
+        "parts": [
+            {
+                "text": message
+            }
+        ]
+    })
+
+    # ==========================
+    # GEMINI REQUEST
+    # ==========================
+
+    payload = {
+        "contents": messages
     }
 
     try:
-        print(URL)
 
         response = requests.post(
             URL,
-            headers=headers,
-            json=data,
-            timeout=60
+            json=payload,
+            timeout=30
         )
 
-        print(response.status_code)
-        print(response.text)
+        data = response.json()
 
-        result = response.json()
+        if response.status_code != 200:
 
-        if "error" in result:
-            return result["error"]["message"]
-
-        answer = result["candidates"][0]["content"]["parts"][0]["text"]
-
-        if (
-            "User Safety:" in answer
-            or "Response Safety:" in answer
-        ):
-            answer = (
-                "Hello! 👋 Welcome to A.A.M CASH KING1. "
-                "How can I help you today?"
+            error = data.get(
+                "error",
+                {}
             )
 
-        if order_id:
-            answer += f"""
+            return error.get(
+                "message",
+                "AI service temporarily unavailable."
+            )
+
+        answer = (
+            data["candidates"][0]["content"]["parts"][0]["text"]
+        )
+
+    except Exception as e:
+
+        print("GEMINI ERROR:", e)
+
+        answer = (
+            "Sorry, I am temporarily unable to respond. "
+            "Please try again shortly."
+        )
+
+    # ==========================
+    # ADD ORDER DETAILS
+    # ==========================
+
+    if order_id:
+
+        answer += f"""
 
 📦 ORDER DETAILS
 
@@ -224,11 +272,4 @@ Assistant:
 /payment/{order_id}
 """
 
-        return answer
-
-    except Exception as e:
-        return f"Connection error: {e}"
-
-       
-
-           
+    return answer
