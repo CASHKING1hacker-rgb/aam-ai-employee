@@ -1,5 +1,4 @@
-# Admin Login Credentials
+import os
 
-ADMIN_USERNAME = "admin"
-
-ADMIN_PASSWORD = "68923278"
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
