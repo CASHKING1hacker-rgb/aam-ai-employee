@@ -59,6 +59,9 @@ form.addEventListener("submit", async function (e) {
         chatBox.appendChild(ai);
 
         scrollBottom();
+        if (data.reply.includes("/payment/")) {
+    window.location.reload();
+}
 
     } catch (err) {
 
