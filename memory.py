@@ -35,6 +35,7 @@ def create_database():
         customer_id INTEGER NOT NULL,
         user_message TEXT,
         ai_reply TEXT,
+        admin_reply TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(customer_id)
         REFERENCES customers(id)
@@ -1114,9 +1115,12 @@ def get_customer_chat(customer_id):
     c = conn.cursor()
 
     c.execute("""
-        SELECT user_message,
-               ai_reply,
-               created_at
+        SELECT
+            id,
+            user_message,
+            ai_reply,
+            admin_reply,
+            created_at
         FROM chats
         WHERE customer_id=?
         ORDER BY id ASC
@@ -1126,7 +1130,9 @@ def get_customer_chat(customer_id):
 
     conn.close()
 
-    return rows                                                                                                                                    
+    return rows
+
+
 def get_customer_orders(customer_id):
 
     conn = connect()

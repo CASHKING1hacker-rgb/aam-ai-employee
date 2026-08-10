@@ -321,98 +321,111 @@ async function refreshPage() {
 
     try {
 
-        const response = await fetch(
-            "/?_=" + Date.now(),
-            {
-                cache: "no-store"
+        const response = await fetch("/history");
+
+        if (!response.ok) {
+            return;
+        }
+
+        const history = await response.json();
+
+        /*
+         * Rebuild chat messages from the server.
+         * This allows admin replies to appear automatically.
+         */
+
+        if (Array.isArray(history)) {
+
+            const existing = chatBox.querySelector("#typing");
+
+            if (!existing) {
+
+                chatBox.innerHTML = "";
+
+                history.forEach(item => {
+
+                    const message = document.createElement("div");
+
+                    if (item.type === "user") {
+
+                        message.className = "user-message";
+                        message.innerHTML =
+                            "👤 " + formatMessage(item.message);
+
+                    } else if (item.type === "admin") {
+
+                        message.className = "admin-message";
+                        message.innerHTML =
+                            "👨‍💼 Admin: " + formatMessage(item.message);
+
+                    } else {
+
+                        message.className = "ai-message";
+                        message.innerHTML =
+                            "🤖 " + formatMessage(item.message);
+                    }
+
+                    chatBox.appendChild(message);
+
+                });
+
+                scrollBottom();
             }
-        );
+        }
 
+        /*
+         * Refresh the complete page order/notification sections.
+         * This fixes the case where #orders did not exist before
+         * the customer's first order.
+         */
 
-        const html = await response.text();
+        const pageResponse = await fetch("/");
 
+        if (!pageResponse.ok) {
+            return;
+        }
+
+        const html = await pageResponse.text();
 
         const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
 
-        const doc =
-            parser.parseFromString(
-                html,
-                "text/html"
-            );
+        const currentOrders = document.getElementById("orders");
+        const newOrders = doc.getElementById("orders");
 
+        if (currentOrders && newOrders) {
+            currentOrders.outerHTML = newOrders.outerHTML;
+        }
 
-        const newOrders =
-            doc.getElementById("orders");
-
+        const currentNotifications =
+            document.getElementById("notifications");
 
         const newNotifications =
             doc.getElementById("notifications");
 
-
-        const orders =
-            document.getElementById("orders");
-
-
-        const notifications =
-            document.getElementById(
-                "notifications"
-            );
-
-
-        if (newOrders && orders) {
-
-            orders.innerHTML =
-                newOrders.innerHTML;
-
+        if (currentNotifications && newNotifications) {
+            currentNotifications.outerHTML =
+                newNotifications.outerHTML;
         }
-
-
-        if (
-            newNotifications &&
-            notifications
-        ) {
-
-            notifications.innerHTML =
-                newNotifications.innerHTML;
-
-        }
-
 
     } catch (e) {
 
-        console.log(
-            "PAGE REFRESH ERROR:",
-            e
-        );
+        console.log("Refresh error:", e);
 
     }
 
 }
 
+function formatMessage(message) {
 
-// =====================================================
-// START LIVE ADMIN CHAT
-// =====================================================
+    return String(message)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+        .replace(/\n/g, "<br>");
+}
 
-initializeAdminMessages()
-    .then(function () {
+setInterval(refreshPage, 3000);
 
-        // Check for new administrator replies
-        // every 3 seconds.
-        setInterval(
-            checkAdminReplies,
-            3000
-        );
-
-    });
-
-
-// =====================================================
-// REFRESH ORDERS + NOTIFICATIONS
-// =====================================================
-
-// Keep your existing 10-second refresh.
-setInterval(
-    refreshPage,
-    10000
-);

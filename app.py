@@ -373,10 +373,17 @@ def remove_order(order_id):
 @app.route("/payment/<int:order_id>", methods=["GET", "POST"])
 def payment(order_id):
 
+    if "customer_id" not in session:
+        return redirect("/register")
+
     order = get_order(order_id)
 
     if not order:
         return "Order not found.", 404
+
+    # Make sure this order belongs to the logged-in customer.
+    if order["customer_id"] != session["customer_id"]:
+        return "Unauthorized.", 403
 
     if request.method == "POST":
 
@@ -389,7 +396,14 @@ def payment(order_id):
             <a href="javascript:history.back()">← Go Back</a>
             """
 
-        filename = file.filename
+        filename = secure_filename(file.filename)
+
+        if not filename:
+            return """
+            <h2>❌ Invalid filename</h2>
+            <p>Please choose another payment screenshot.</p>
+            <a href="javascript:history.back()">← Go Back</a>
+            """
 
         filepath = os.path.join(
             app.config["UPLOAD_FOLDER"],
