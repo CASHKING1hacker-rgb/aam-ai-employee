@@ -491,16 +491,38 @@ def delete_order(order_id):
     conn = connect()
     c = conn.cursor()
 
-    c.execute(
-        """
-        DELETE FROM orders
-        WHERE id=?
-        """,
-        (order_id,)
-    )
+    try:
 
-    conn.commit()
-    conn.close()
+        # Delete payment records belonging to this order first.
+        # This prevents foreign-key errors when the order has a receipt.
+        try:
+            c.execute(
+                """
+                DELETE FROM payments
+                WHERE order_id=?
+                """,
+                (order_id,)
+            )
+        except Exception:
+            pass
+
+        # Delete the order itself.
+        c.execute(
+            """
+            DELETE FROM orders
+            WHERE id=?
+            """,
+            (order_id,)
+        )
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()
 
 
 def delete_customer(customer_id):
@@ -1204,3 +1226,61 @@ Your files are ready.
     conn.close()
 
     return message                                                                                                                                                                                                               
+
+
+# ===============================
+# ADMIN CHAT REPLY
+# ===============================
+
+def save_admin_reply(customer_id, admin_message):
+
+    conn = connect()
+    c = conn.cursor()
+
+    c.execute(
+        """
+        INSERT INTO chats(
+            customer_id,
+            user_message,
+            ai_reply,
+            admin_reply
+        )
+        VALUES(?, ?, ?, ?)
+        """,
+        (
+            customer_id,
+            "",
+            "",
+            admin_message
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_customer_conversation(customer_id):
+
+    conn = connect()
+    c = conn.cursor()
+
+    c.execute(
+        """
+        SELECT
+            id,
+            user_message,
+            ai_reply,
+            admin_reply,
+            created_at
+        FROM chats
+        WHERE customer_id=?
+        ORDER BY id ASC
+        """,
+        (customer_id,)
+    )
+
+    rows = c.fetchall()
+
+    conn.close()
+
+    return rows

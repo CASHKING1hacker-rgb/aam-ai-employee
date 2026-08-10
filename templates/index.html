@@ -91,7 +91,7 @@ href="{{ url_for('static', filename='style.css') }}">
 
                     <td>
 
-    {% if order["status"]=="Completed" %}
+    {% if order["status"]|lower=="completed" %}
 
         <span class="badge badge-approved">
             Approved
@@ -110,7 +110,7 @@ href="{{ url_for('static', filename='style.css') }}">
             📸 Upload Payment Screenshot
         </a>
 
-    {% elif order["status"]=="Rejected" %}
+    {% elif order["status"]|lower=="rejected" %}
 
         <span class="badge badge-rejected">
             Rejected

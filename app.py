@@ -45,7 +45,10 @@ from memory import (
     get_customers,
     get_customer_chats,
     get_notifications,
-    get_customer_chat
+    get_customer_chat,
+    delete_customer,
+    save_admin_reply,
+    get_customer_conversation
 )
 
 # ===============================
@@ -207,22 +210,38 @@ def history():
     if "customer_id" not in session:
         return jsonify([])
 
-    chats = get_recent_chats(
-        session["customer_id"],
-        limit=100
+    chats = get_customer_conversation(
+        session["customer_id"]
     )
 
     history = []
 
     for chat in chats:
 
-        history.append({
-            "user": chat["user_message"],
-            "ai": chat["ai_reply"]
-        })
+        if chat["user_message"]:
+            history.append({
+                "type": "user",
+                "message": chat["user_message"],
+                "created_at": chat["created_at"]
+            })
+
+        if chat["ai_reply"]:
+            history.append({
+                "type": "ai",
+                "message": chat["ai_reply"],
+                "created_at": chat["created_at"]
+            })
+
+        if chat["admin_reply"]:
+            history.append({
+                "type": "admin",
+                "message": chat["admin_reply"],
+                "created_at": chat["created_at"]
+            })
 
     return jsonify(history)
-    
+
+
 # ===============================
 # ADMIN LOGIN
 # ===============================
@@ -525,6 +544,35 @@ def customer_chat(customer_id):
         chats=chats,
         customer_id=customer_id
     )
+
+
+@app.route("/admin/customer/<int:customer_id>/reply", methods=["POST"])
+def admin_customer_reply(customer_id):
+
+    if not session.get("admin"):
+        return redirect("/admin/login")
+
+    message = request.form.get("message", "").strip()
+
+    if message:
+        save_admin_reply(
+            customer_id,
+            message
+        )
+
+        create_notification(
+            customer_id,
+            "👨‍💼 An administrator has replied to your message."
+        )
+
+        log_action(
+            f"Admin replied to customer #{customer_id}"
+        )
+
+    return redirect(
+        f"/admin/customer/{customer_id}"
+    )
+
 
 
 @app.route("/admin/customer/orders/<int:customer_id>")

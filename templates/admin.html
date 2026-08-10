@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -9,7 +8,6 @@
 
 <link rel="stylesheet"
 href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 
 <body>
@@ -18,12 +16,11 @@ href="{{ url_for('static', filename='style.css') }}">
 
 <div class="sidebar">
 
-<h2>📶 A.A.M</h2>
+<h2>📶 A.A.M CASH KING1</h2>
 
 <a href="/admin">🏠 Dashboard</a>
-
+<a href="/admin/customers">👥 Customers</a>
 <a href="/admin/payments">💳 Payments</a>
-
 <a href="/admin/logout">🚪 Logout</a>
 
 <h3 style="margin-top:30px;">🕒 Recent Activity</h3>
@@ -32,25 +29,21 @@ href="{{ url_for('static', filename='style.css') }}">
 
 {% if activity %}
 
-    {% for item in activity %}
+{% for item in activity %}
 
-        <p>
+<p>
+<strong>{{ item["created_at"] }}</strong>
+<br>
+{{ item["action"] }}
+</p>
 
-        <strong>{{ item["created_at"] }}</strong>
+<hr>
 
-        <br>
-
-        {{ item["action"] }}
-
-        </p>
-
-        <hr>
-
-    {% endfor %}
+{% endfor %}
 
 {% else %}
 
-    <p>No recent activity.</p>
+<p>No recent activity.</p>
 
 {% endif %}
 
@@ -58,17 +51,17 @@ href="{{ url_for('static', filename='style.css') }}">
 
 </div>
 
+
 <div class="main-content">
 
 <div class="header">
 
-<h2>Admin Dashboard</h2>
+<h2>📊 Admin Dashboard</h2>
 
 <p>Welcome Administrator</p>
 
 </div>
 
-<div class="dashboard">
 
 <div class="stats-grid">
 
@@ -96,29 +89,27 @@ href="{{ url_for('static', filename='style.css') }}">
 <div class="stat-title">Revenue</div>
 </div>
 
+</div>
+
+
 <div style="margin:20px 0;text-align:center;">
 
-<a href="/admin/payments">
-<button class="primary-btn">💳 Payments</button>
-</a>
-
 <a href="/admin/customers">
-    <button class="primary-btn">
-        👥 Customers
-    </button>
+<button class="primary-btn">
+👥 Customers
+</button>
 </a>
 
-<a href="/admin">
-<button class="primary-btn">📦 Orders</button>
-</a>
-
-<a href="/">
-<button class="primary-btn">💬 Customer Chat</button>
+<a href="/admin/payments">
+<button class="primary-btn">
+💳 Payment Approvals
+</button>
 </a>
 
 </div>
 
-<h3 style="margin-top:30px;">📦 Recent Orders</h3>
+
+<h3>📦 Recent Orders</h3>
 
 <table>
 
@@ -127,10 +118,12 @@ href="{{ url_for('static', filename='style.css') }}">
 <th>Customer</th>
 <th>Service</th>
 <th>Amount</th>
+<th>Invoice</th>
 <th>Status</th>
 <th>Actions</th>
 
 </tr>
+
 
 {% for order in order_list %}
 
@@ -142,31 +135,56 @@ href="{{ url_for('static', filename='style.css') }}">
 
 <td>{{ order["amount"] }} UGX</td>
 
+<td>{{ order["invoice"] }}</td>
+
 <td>
 
-{% if order["status"]=="Completed" %}
+{% set status = order["status"]|lower %}
+
+{% if status == "completed" %}
 
 <span class="badge badge-approved">
 Approved
 </span>
 
-{% elif order["status"]=="Pending" %}
+{% elif status in ["pending", "waiting verification"] %}
 
 <span class="badge badge-pending">
 Pending
 </span>
 
-{% else %}
+{% elif status == "rejected" %}
 
 <span class="badge badge-rejected">
 Rejected
+</span>
+
+{% else %}
+
+<span class="badge badge-pending">
+{{ order["status"] }}
 </span>
 
 {% endif %}
 
 </td>
 
+
 <td>
+
+<a href="/admin/customer/{{ order['customer_id'] }}">
+<button class="primary-btn">
+💬 Chat
+</button>
+</a>
+
+<a href="/admin/customer/orders/{{ order['customer_id'] }}">
+<button class="approve-btn">
+📦 Orders
+</button>
+</a>
+
+{% if status != "completed" %}
 
 <a href="/complete/{{ order['id'] }}">
 <button class="primary-btn">
@@ -174,11 +192,15 @@ Rejected
 </button>
 </a>
 
+{% endif %}
+
 <a href="/delete/{{ order['id'] }}"
 onclick="return confirm('Delete this order?');">
-<button class="primary-btn">
+
+<button class="reject-btn">
 🗑 Delete
 </button>
+
 </a>
 
 </td>
@@ -192,20 +214,6 @@ onclick="return confirm('Delete this order?');">
 </div>
 
 </div>
-
-</div>
-
-</div>
-
-<script>
-
-setInterval(function(){
-
-location.reload();
-
-},30000);
-
-</script>
 
 </body>
 </html>

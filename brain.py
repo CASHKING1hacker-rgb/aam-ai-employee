@@ -132,6 +132,20 @@ def reply(message, customer_id):
             f"New order created: {invoice}"
         )
 
+        return (
+            "✅ Order created successfully!\\n\\n"
+            f"📦 Service: {service}\\n"
+            f"💰 Amount: {amount:,} UGX\\n"
+            f"🧾 Invoice: {invoice}\\n\\n"
+            "💳 Please make your payment to one of our official "
+            "Airtel Money numbers:\\n"
+            "• 0707042220 — MUZAFARU\\n"
+            "• 0758710606 — MAYANJA\\n"
+            "• 0704115459 — MUZAFARU\\n\\n"
+            "After payment, upload your payment screenshot "
+            "using the Upload Payment Screenshot button in My Orders."
+        )
+
     # ==========================
     # LOAD KNOWLEDGE
     # ==========================

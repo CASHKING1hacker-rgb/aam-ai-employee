@@ -11,6 +11,53 @@
 <link rel="stylesheet"
 href="{{ url_for('static', filename='style.css') }}">
 
+<style>
+
+.chat-wrapper {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.message {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
+
+.client {
+    background: #e8f0fe;
+}
+
+.ai {
+    background: #eef7ee;
+}
+
+.admin {
+    background: #fff3cd;
+}
+
+.reply-box {
+    margin-top: 30px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+.reply-box textarea {
+    width: 100%;
+    min-height: 100px;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.reply-box button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+</style>
+
 </head>
 
 <body>
@@ -23,28 +70,83 @@ href="{{ url_for('static', filename='style.css') }}">
 
 <a href="/admin">🏠 Dashboard</a>
 <a href="/admin/customers">👥 Customers</a>
+<a href="/admin/payments">💳 Payments</a>
+<a href="/admin/logout">🚪 Logout</a>
 
 </div>
 
 <div class="main-content">
 
+<div class="chat-wrapper">
+
 <h2>💬 Customer Conversation</h2>
 
 {% for chat in chats %}
 
-<div class="user-message">
-👤 {{ chat["user_message"] }}
-</div>
+    {% if chat["user_message"] %}
 
-<div class="ai-message">
-🤖 {{ chat["ai_reply"] }}
-</div>
+    <div class="message client">
+        <strong>👤 Client</strong>
+        <br><br>
+        {{ chat["user_message"] }}
+    </div>
 
-<small>{{ chat["created_at"] }}</small>
+    {% endif %}
 
-<hr>
+
+    {% if chat["ai_reply"] %}
+
+    <div class="message ai">
+        <strong>🤖 AI Employee</strong>
+        <br><br>
+        {{ chat["ai_reply"] }}
+    </div>
+
+    {% endif %}
+
+
+    {% if chat["admin_reply"] %}
+
+    <div class="message admin">
+        <strong>👨‍💼 Admin</strong>
+        <br><br>
+        {{ chat["admin_reply"] }}
+    </div>
+
+    {% endif %}
+
+    <small>
+        {{ chat["created_at"] }}
+    </small>
+
+    <hr>
 
 {% endfor %}
+
+
+<div class="reply-box">
+
+<h3>👨‍💼 Reply to Customer</h3>
+
+<form method="POST"
+      action="/admin/customer/{{ customer_id }}/reply">
+
+<textarea
+    name="message"
+    placeholder="Type your reply to the customer..."
+    required></textarea>
+
+<br>
+
+<button type="submit" class="primary-btn">
+📤 Send Reply
+</button>
+
+</form>
+
+</div>
+
+</div>
 
 </div>
 
