@@ -379,7 +379,7 @@ async function refreshPage() {
          * the customer's first order.
          */
 
-        const pageResponse = await fetch("/");
+        const pageResponse = await fetch("/chat");
 
         if (!pageResponse.ok) {
             return;

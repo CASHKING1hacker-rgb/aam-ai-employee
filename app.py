@@ -98,7 +98,7 @@ def register():
         session["customer_id"] = customer_id
         session["customer_name"] = name
 
-        return redirect("/")
+        return redirect("/chat")
 
     return render_template("register.html")
 
@@ -109,6 +109,11 @@ def register():
 
 @app.route("/")
 def home():
+    return render_template("home.html")
+
+
+@app.route("/chat")
+def chat():
 
     if "customer_id" not in session:
         return redirect("/register")
@@ -123,7 +128,7 @@ def home():
     notifications = get_notifications(
         customer_id
     )
-    
+
     orders = get_customer_orders(customer_id)
 
     return render_template(
