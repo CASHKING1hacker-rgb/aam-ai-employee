@@ -139,6 +139,52 @@ def home():
 # CUSTOMER LOGOUT
 # ===============================
 
+
+# ===============================
+# SEO - ROBOTS & SITEMAP
+# ===============================
+
+@app.route("/robots.txt")
+def robots_txt():
+
+    return """User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /send
+Disallow: /history
+Disallow: /payment/
+Disallow: /uploads/
+Disallow: /complete/
+Disallow: /delete/
+Disallow: /approve/
+Disallow: /reject/
+Disallow: /search
+Disallow: /logout
+
+Sitemap: https://aam-ai-employee-1.onrender.com/sitemap.xml
+""", 200, {
+        "Content-Type": "text/plain"
+    }
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://aam-ai-employee-1.onrender.com/</loc>
+    </url>
+
+</urlset>
+""", 200, {
+        "Content-Type": "application/xml"
+    }
+
+
 @app.route("/logout")
 def logout():
 
